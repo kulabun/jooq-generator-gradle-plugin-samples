@@ -1,0 +1,47 @@
+import org.labun.jooq.codegen.config.Defaults
+
+buildscript {
+    repositories {
+        mavenLocal()
+        jcenter()
+        maven { url 'https://plugins.gradle.org/m2/' }
+    }
+
+    dependencies {
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.4.0'
+        classpath 'org.labun.jooq.codegen:gradle-plugin:1.0'
+        classpath 'com.h2database:h2:1.4.196'
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'org.labun.jooq.codegen'
+
+jooqCodeGeneration {
+    database = {
+        username = 'user'
+        password = 'pass'
+        driverClass = 'org.h2.Driver'
+        dbMetaClass = 'org.jooq.util.h2.H2Database'
+        jdbcUrl = 'jdbc:h2:mem:test;'
+        schemas = ['H1']
+    }
+
+    generators = [
+            { generatorName = Defaults.GeneratorsNames.SCHEMA },
+            { generatorName = Defaults.GeneratorsNames.TABLE },
+            { generatorName = Defaults.GeneratorsNames.COLUMNS },
+            { generatorName = Defaults.GeneratorsNames.RECORD },
+            {
+                generatorName = 'CustomGenerator'
+                codeGenerationTask = 'org.labun.jooq.codegen.task.TableCodeGenerationTask'
+                generatorName = 'CUSTOM'
+                packageName = 'org.labun.jooq.codegen.custom'
+                className = nameConfig {
+                    postfix = 'Table'
+                }
+                template = 'templates/java/table.vm'
+                javaTimeDates = true
+            }
+    ]
+}
