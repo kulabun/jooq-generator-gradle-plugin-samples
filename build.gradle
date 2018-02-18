@@ -1,4 +1,4 @@
-import org.labun.jooq.codegen.config.Defaults
+import org.labun.jooq.generator.config.Defaults
 
 buildscript {
     repositories {
@@ -9,13 +9,13 @@ buildscript {
 
     dependencies {
         classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.4.0'
-        classpath 'org.labun.jooq.codegen:gradle-plugin:1.0'
+        classpath 'org.labun.jooq:code-generator-gradle-plugin:1.0'
         classpath 'com.h2database:h2:1.4.196'
     }
 }
 
 apply plugin: 'java'
-apply plugin: 'org.labun.jooq.codegen'
+apply plugin: 'org.labun.jooq.codegenerator'
 
 jooqCodeGeneration {
     database = {
@@ -23,8 +23,8 @@ jooqCodeGeneration {
         password = 'pass'
         driverClass = 'org.h2.Driver'
         dbMetaClass = 'org.jooq.util.h2.H2Database'
-        jdbcUrl = 'jdbc:h2:mem:test;'
-        schemas = ['H1']
+        jdbcUrl = 'jdbc:h2:mem:test;INIT=RUNSCRIPT FROM \'init.sql\';'
+        schemas = ['PUBLIC']
     }
 
     generators = [
@@ -32,11 +32,11 @@ jooqCodeGeneration {
             { generatorName = Defaults.GeneratorsNames.TABLE },
             { generatorName = Defaults.GeneratorsNames.COLUMNS },
             { generatorName = Defaults.GeneratorsNames.RECORD },
+            { generatorName = Defaults.GeneratorsNames.REPOSITORY },
             {
                 generatorName = 'CustomGenerator'
-                codeGenerationTask = 'org.labun.jooq.codegen.task.TableCodeGenerationTask'
-                generatorName = 'CUSTOM'
-                packageName = 'org.labun.jooq.codegen.custom'
+                codeGenerationTask = 'org.labun.jooq.generator.task.TableCodeGenerationTask'
+                packageName = 'org.labun.jooq.generator.custom'
                 className = nameConfig {
                     postfix = 'Table'
                 }
