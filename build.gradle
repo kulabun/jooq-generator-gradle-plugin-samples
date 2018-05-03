@@ -1,7 +1,8 @@
-import org.labun.jooq.generator.config.Defaults
+import org.labun.jooq.generator.generation.GeneratorsNames
 
 buildscript {
     repositories {
+        maven { url uri('../local-repo') }
         mavenLocal()
         jcenter()
         maven { url 'https://plugins.gradle.org/m2/' }
@@ -9,7 +10,7 @@ buildscript {
 
     dependencies {
         classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.4.0'
-        classpath 'org.labun.jooq:code-generator-gradle-plugin:1.0'
+        classpath 'org.labun.jooq:code-generator-gradle-plugin:2.0-SNAPSHOT'
         classpath 'com.h2database:h2:1.4.196'
     }
 }
@@ -28,14 +29,18 @@ jooqCodeGeneration {
     }
 
     generators = [
-            { generatorName = Defaults.GeneratorsNames.SCHEMA },
-            { generatorName = Defaults.GeneratorsNames.TABLE },
-            { generatorName = Defaults.GeneratorsNames.COLUMNS },
-            { generatorName = Defaults.GeneratorsNames.RECORD },
-            { generatorName = Defaults.GeneratorsNames.REPOSITORY },
+            { generatorName = GeneratorsNames.CATALOG },
+            { generatorName = GeneratorsNames.SCHEMA },
+            { generatorName = GeneratorsNames.SCHEMA_INDEXES },
+            { generatorName = GeneratorsNames.SCHEMA_SEQUENCES },
+            { generatorName = GeneratorsNames.SCHEMA_KEYS },
+            { generatorName = GeneratorsNames.TABLE },
+            { generatorName = GeneratorsNames.TABLE_COLUMNS },
+            { generatorName = GeneratorsNames.TABLE_RECORD },
+            { generatorName = GeneratorsNames.REPOSITORY },
             {
                 generatorName = 'CustomGenerator'
-                codeGenerationTask = 'org.labun.jooq.generator.task.TableCodeGenerationTask'
+                subGenerator = 'org.labun.jooq.generator.task.TableSubGenerator'
                 packageName = 'org.labun.jooq.generator.custom'
                 className = nameConfig {
                     postfix = 'Table'
